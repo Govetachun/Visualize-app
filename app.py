@@ -6,40 +6,38 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import seaborn as sns
+from streamlit_juxtapose import juxtapose
 
+from PIL import Image
+import requests
+
+import pathlib
 if os.path.exists('./dataset.csv'): 
     df = pd.read_csv('dataset.csv', index_col=None)
-
+st.set_page_config(layout="centered", page_icon="🔭", page_title="Visualizing app")
 if "visibility" not in st.session_state:
     st.session_state.visibility = "visible"
     st.session_state.disabled = False
 with st.sidebar:
     st.image("https://www.onepointltd.com/wp-content/uploads/2020/03/inno2.png")
     st.title("Visualize Dashboard for Deep Learning")
-    choice = st.radio("Navigaion",["Input data","Data exploratory","Machine Learning Model","Choose epoch to run ML model"])
+    choice = st.radio("Navigaion",["Input data","Data exploratory","Machine Learning Model","Choose epoch to run ML model","Bonus: Comparing Image"])
     st.info("This is project for deep learning visualization")
 col10, col20, col30 = st.columns(3)
 col10.metric("Temperature", "70 °F", "1.2 °F")
 col20.metric("Wind", "9 mph", "-8%")
 col30.metric("Humidity", "86%", "4%")
 if choice == "Input data":
-    # tab1, tab2 = st.tabs(["Randomize 20x500 dataset","Upload your dataset"])
-    # with tab2:
-    #     
-    #     file = st.file_uploader("Upload Your Dataset")
-    #     if file: 
-    #         df = pd.read_csv(file, index_col=None)
-    #         df.to_csv('dataset.csv', index=None)
-    #         st.dataframe(df)
-    #         st.info(df.shape)
-    # with tab1:
+
         st.info("Random your data as 20x500 and save to .csv file")
         click = st.button("Random your data")
         if click:
-            df = pd.DataFrame(np.random.randn(20, 500), columns=list(range(1,501)))
+            df = pd.DataFrame(np.random.randn(20, 500), columns= list(range(1,501)))
+
             df.to_csv('dataset.csv',index=None)
             st.dataframe(df)
             st.info(df.shape)
+
               
 elif choice == "Data exploratory":
     dropdown_box = st.selectbox(
@@ -220,3 +218,38 @@ elif choice == "Choose epoch to run ML model":
                     print_per_cluster("./output/train/scatter/*.png")
                     
         st.success("Compile done")
+        
+elif choice == "Bonus: Comparing Image":
+    st.title("Comparing 2 image from satellite")
+    STREAMLIT_STATIC_PATH = (
+        pathlib.Path(st.__path__[0]) / "static"
+    )  # at venv/lib/python3.9/site-packages/streamlit/static
+
+    IMG1 = "img1.png"
+    IMG2 = "img2.png"
+
+    
+    DEFAULT_IMG1_URL = (
+        "https://juxtapose.knightlab.com/static/img/Sochi_11April2005.jpg"
+    )
+    DEFAULT_IMG2_URL = (
+        "https://juxtapose.knightlab.com/static/img/Sochi_22Nov2013.jpg"
+    )
+
+    def fetch_img_from_url(url: str) -> Image:
+        img = Image.open(requests.get(url, stream=True).raw)
+        return img
+
+    form = st.form(key="Image comparison")
+    img1_url = form.text_input("Image one url", value=DEFAULT_IMG1_URL)
+    img1 = fetch_img_from_url(img1_url)
+    img1.save(STREAMLIT_STATIC_PATH / IMG1)
+
+    img2_url = form.text_input("Image two url", value=DEFAULT_IMG2_URL)
+    img2 = fetch_img_from_url(img2_url)
+    img2.save(STREAMLIT_STATIC_PATH / IMG2)
+
+    submit = form.form_submit_button("Submit")
+    if submit:
+        juxtapose(IMG1, IMG2)
+    
