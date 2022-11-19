@@ -21,7 +21,8 @@ if "visibility" not in st.session_state:
 with st.sidebar:
     st.image("https://www.onepointltd.com/wp-content/uploads/2020/03/inno2.png")
     st.title("Visualize Dashboard for Deep Learning")
-    choice = st.radio("Navigaion",["Input data","Data exploratory","Machine Learning Model","Choose epoch to run ML model","Bonus: Comparing Image"])
+  
+    choice = st.radio("Navigaion",["Input data","Data exploratory and generiting data for model","Machine Learning Model","Choose epoch to run ML model","Bonus: Comparing Image"])
     st.info("This is project for deep learning visualization")
 col10, col20, col30 = st.columns(3)
 col10.metric("Temperature", "70 °F", "1.2 °F")
@@ -39,12 +40,12 @@ if choice == "Input data":
             st.info(df.shape)
 
               
-elif choice == "Data exploratory":
+elif choice == "Data exploratory and generiting data for model":
     dropdown_box = st.selectbox(
         'Choose the chart plot: ',
-        ('Bar chart','Line chart', 'Scatter chart',"Print all")
+        ('Bar chart','Line chart', 'Scatter chart',"Generating data")
     )
-    if dropdown_box != "Print all":
+    if dropdown_box != "Generating data":
         text_input = st.text_input(
             "Enter the number of chart N 👇",
             label_visibility=st.session_state.visibility,
@@ -84,7 +85,7 @@ elif choice == "Data exploratory":
     else:
         # st.set_page_config(layout="wide")
         
-        st.title("Gererating 500 data per epochs")
+        st.title("Gererating 500 data each chart")
         generate_graph = st.button("Click to start generate data")
         
         if generate_graph:
